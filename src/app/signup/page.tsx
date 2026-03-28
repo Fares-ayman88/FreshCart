@@ -92,7 +92,7 @@ export default function SignupPage() {
 
               <div className="space-y-4">
                 <h1 className="section-title max-w-md text-4xl font-bold leading-tight text-slate-950 sm:text-[2.8rem]">
-                  Get Start Shopping
+                  Get Started Shopping
                 </h1>
                 <p className="max-w-lg text-base leading-8 text-slate-600">
                   Welcome to FreshCart! Create your account to save favorites,

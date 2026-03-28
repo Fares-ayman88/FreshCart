@@ -1,4 +1,4 @@
-export const SITE_NAME = "FreshCart Pro";
+export const SITE_NAME = "FreshCart";
 export const API_BASE_URL = "https://ecommerce.routemisr.com/api";
 export const AUTH_COOKIE_KEY = "freshcart_token";
 
@@ -11,51 +11,49 @@ export const NAV_LINKS = [
 
 export const FEATURE_HIGHLIGHTS = [
   {
-    title: "Fast delivery",
-    description: "Checkout in minutes and keep track of every order in one place.",
+    title: "Free Shipping",
+    description: "On orders over 500 EGP",
   },
   {
-    title: "Smart discovery",
-    description: "Search, filter by brand, explore categories, and browse related products.",
+    title: "Secure Payment",
+    description: "100% secure transactions",
   },
   {
-    title: "Personalized account",
-    description: "Manage your wishlist, profile details, password, and payment flow.",
+    title: "Easy Returns",
+    description: "14-day return policy",
+  },
+  {
+    title: "24/7 Support",
+    description: "Dedicated support team",
   },
 ] as const;
 
 export const HERO_SLIDES = [
   {
-    id: "fresh-fashion",
-    eyebrow: "New season picks",
-    title: "Fresh looks, fast checkout, zero friction.",
-    description:
-      "A polished storefront experience inspired by FreshCart, powered by Next.js and the Route Academy API.",
-    primaryAction: { href: "/products", label: "Shop products" },
-    secondaryAction: { href: "/categories", label: "View categories" },
-    image:
-      "https://ecommerce.routemisr.com/Route-Academy-categories/1681511818071.jpeg",
+    id: "fresh-delivery",
+    eyebrow: "Everyday essentials",
+    title: "Fresh Products Delivered to your Door",
+    description: "Get 20% off your first order",
+    primaryAction: { href: "/products", label: "Shop Now" },
+    secondaryAction: { href: "/products?sort=-ratingsAverage", label: "View Deals" },
+    image: "/home-slider-1.png",
   },
   {
-    id: "kitchen-ready",
-    eyebrow: "Daily essentials",
-    title: "Build a basket that feels effortless.",
-    description:
-      "Add to cart, save to wishlist, and jump into secure online or cash payment without leaving the flow.",
-    primaryAction: { href: "/cart", label: "Open cart" },
-    secondaryAction: { href: "/wishlist", label: "See wishlist" },
-    image:
-      "https://ecommerce.routemisr.com/Route-Academy-categories/1681511452254.png",
+    id: "premium-quality",
+    eyebrow: "Fresh from farm to table",
+    title: "Premium Quality Guaranteed",
+    description: "Shop trusted products with cleaner checkout and faster delivery.",
+    primaryAction: { href: "/products", label: "Shop Now" },
+    secondaryAction: { href: "/about", label: "Learn More" },
+    image: "/home-slider-1.png",
   },
   {
-    id: "electronics",
-    eyebrow: "Popular brands",
-    title: "From brands to subcategories, everything stays organized.",
-    description:
-      "Dive into product details, compare related items, and move from discovery to order history in one clean journey.",
-    primaryAction: { href: "/brands", label: "Browse brands" },
-    secondaryAction: { href: "/orders", label: "Track orders" },
-    image:
-      "https://ecommerce.routemisr.com/Route-Academy-categories/1681511121316.png",
+    id: "smart-savings",
+    eyebrow: "Daily savings",
+    title: "Shop smart, stock fast, save more on your favorites",
+    description: "Browse categories, compare products, and fill the cart in one smooth flow.",
+    primaryAction: { href: "/products", label: "Shop Now" },
+    secondaryAction: { href: "/categories", label: "Browse Categories" },
+    image: "/home-slider-1.png",
   },
 ] as const;

@@ -4,7 +4,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { useDeferredValue, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, Search, Sparkles } from "lucide-react";
+import {
+  ArrowRight,
+  Headphones,
+  RotateCcw,
+  Search,
+  ShieldCheck,
+  Truck,
+} from "lucide-react";
 
 import { HeroSlider } from "@/components/home/hero-slider";
 import { ProductCard } from "@/components/products/product-card";
@@ -12,6 +19,25 @@ import { buttonVariants } from "@/components/ui/button";
 import { getCategories, getProducts, queryKeys } from "@/lib/api";
 import { FEATURE_HIGHLIGHTS } from "@/lib/constants";
 import { cn, extractErrorMessage } from "@/lib/utils";
+
+const featureStyles = [
+  {
+    icon: Truck,
+    iconClassName: "bg-sky-50 text-sky-500",
+  },
+  {
+    icon: ShieldCheck,
+    iconClassName: "bg-emerald-50 text-emerald-500",
+  },
+  {
+    icon: RotateCcw,
+    iconClassName: "bg-orange-50 text-orange-500",
+  },
+  {
+    icon: Headphones,
+    iconClassName: "bg-violet-50 text-violet-500",
+  },
+] as const;
 
 export default function HomePage() {
   const [keyword, setKeyword] = useState("");
@@ -36,22 +62,38 @@ export default function HomePage() {
   });
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-12">
       <HeroSlider />
 
-      <section className="grid gap-4 md:grid-cols-3">
-        {FEATURE_HIGHLIGHTS.map((item) => (
-          <article
-            key={item.title}
-            className="surface-card rounded-[1.75rem] px-6 py-6 transition hover:-translate-y-1"
-          >
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--brand-soft)] text-[var(--brand)]">
-              <Sparkles className="h-5 w-5" />
-            </div>
-            <h2 className="mb-2 text-xl font-semibold text-slate-950">{item.title}</h2>
-            <p className="text-sm leading-7 text-slate-600">{item.description}</p>
-          </article>
-        ))}
+      <section className="grid gap-4 lg:grid-cols-4">
+        {FEATURE_HIGHLIGHTS.map((item, index) => {
+          const featureStyle = featureStyles[index];
+          const Icon = featureStyle.icon;
+
+          return (
+            <article
+              key={item.title}
+              className="flex items-center gap-4 rounded-[1.35rem] border border-slate-200 bg-white px-5 py-5 shadow-[0_10px_24px_rgba(15,23,42,0.05)]"
+            >
+              <div
+                className={cn(
+                  "flex h-14 w-14 shrink-0 items-center justify-center rounded-full",
+                  featureStyle.iconClassName,
+                )}
+              >
+                <Icon className="h-6 w-6" />
+              </div>
+              <div>
+                <h2 className="text-[1.35rem] font-semibold text-slate-950">
+                  {item.title}
+                </h2>
+                <p className="text-[15px] leading-7 text-slate-600">
+                  {item.description}
+                </p>
+              </div>
+            </article>
+          );
+        })}
       </section>
 
       <section className="space-y-6">

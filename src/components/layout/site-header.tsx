@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import {
   ChevronDown,
@@ -53,7 +54,6 @@ export function SiteHeader() {
   const isAuthenticated = Boolean(token);
   const cartCount = cartQuery.data?.numOfCartItems ?? 0;
   const wishlistCount = wishlistQuery.data?.data?.length ?? 0;
-  const brandName = SITE_NAME.replace(/\s+Pro$/i, "");
   const profileLabel = user?.name?.split(" ")[0] ?? "My Account";
 
   useEffect(() => {
@@ -95,9 +95,9 @@ export function SiteHeader() {
   }
 
   const navLinkClass =
-    "inline-flex items-center gap-1 text-sm font-medium text-slate-700 transition hover:text-[var(--brand)]";
+    "inline-flex items-center gap-1 text-[15px] font-medium text-slate-700 transition hover:text-[var(--brand)]";
   const iconButtonClass =
-    "relative inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition hover:border-[var(--brand)] hover:text-[var(--brand)]";
+    "relative inline-flex h-11 w-11 items-center justify-center rounded-full text-slate-500 transition hover:bg-slate-100 hover:text-[var(--brand)]";
   const pillButtonClass =
     "inline-flex h-11 items-center justify-center rounded-full bg-[var(--brand)] px-5 text-sm font-semibold text-white shadow-[0_14px_32px_rgba(10,173,10,0.22)] transition hover:bg-[var(--brand-strong)]";
   const mobileNavLinkClass =
@@ -175,7 +175,7 @@ export function SiteHeader() {
           </div>
         </div>
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between gap-3 py-4 lg:gap-6">
+          <div className="flex items-center justify-between gap-4 py-4 lg:gap-7">
             <div className="flex items-center gap-3">
               <button
                 aria-expanded={mobileMenuOpen}
@@ -187,33 +187,37 @@ export function SiteHeader() {
                 <Menu className="h-5 w-5" />
               </button>
 
-              <Link className="flex items-center gap-3" href="/">
-                <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--brand-soft)] text-[var(--brand)]">
-                  <ShoppingCart className="h-7 w-7" strokeWidth={2.1} />
-                </span>
-                <span className="section-title text-[2rem] font-bold tracking-[-0.06em] text-slate-950 sm:text-[2.2rem]">
-                  {brandName}
-                </span>
+              <Link className="shrink-0" href="/">
+                <Image
+                  alt={SITE_NAME}
+                  className="h-6 w-auto lg:h-8"
+                  height={32}
+                  priority
+                  src="/freshcart-logo.svg"
+                  width={166}
+                />
               </Link>
             </div>
 
             <form
               key={`${pathname}-${keyword}-desktop`}
-              className="hidden min-w-0 flex-1 items-center rounded-full border border-slate-200 bg-white px-6 py-2 shadow-sm shadow-slate-200/60 md:flex lg:max-w-[27rem] xl:max-w-[34rem]"
+              className="hidden flex-1 lg:flex lg:max-w-2xl"
               onSubmit={handleSearchSubmit}
             >
-              <input
-                defaultValue={keyword}
-                className="h-11 min-w-0 flex-1 border-none bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400"
-                name="keyword"
-                placeholder="Search for products, brands and more..."
-              />
-              <button
-                className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--brand)] text-white shadow-[0_14px_32px_rgba(10,173,10,0.22)] transition hover:bg-[var(--brand-strong)]"
-                type="submit"
-              >
-                <Search className="h-5 w-5" />
-              </button>
+              <div className="relative w-full">
+                <input
+                  defaultValue={keyword}
+                  className="h-[3.35rem] w-full rounded-full border border-slate-200 bg-slate-50/80 px-5 pr-14 text-sm text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-[var(--brand)] focus:bg-white focus:ring-4 focus:ring-green-500/10"
+                  name="keyword"
+                  placeholder="Search for products, brands and more..."
+                />
+                <button
+                  className="absolute right-1.5 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-[var(--brand)] text-white shadow-[0_10px_20px_rgba(10,173,10,0.28)] transition hover:bg-[var(--brand-strong)]"
+                  type="submit"
+                >
+                  <Search className="h-4 w-4" />
+                </button>
+              </div>
             </form>
 
             <div className="hidden items-center gap-5 lg:flex xl:gap-7">
@@ -238,15 +242,18 @@ export function SiteHeader() {
                 })}
               </nav>
 
-              <div className="hidden items-center gap-3 border-l border-slate-200 pl-6 xl:flex">
-                <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--brand-soft)] text-[var(--brand)]">
+              <Link
+                className="hidden items-center gap-3 border-l border-slate-200 pl-5 xl:flex"
+                href="/contact"
+              >
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--brand-soft)] text-[var(--brand)]">
                   <Headphones className="h-5 w-5" />
                 </span>
-                <div className="text-sm leading-5">
-                  <p className="text-slate-500">Support</p>
+                <div className="text-xs leading-5">
+                  <p className="text-slate-400">Support</p>
                   <p className="font-semibold text-slate-900">24/7 Help</p>
                 </div>
-              </div>
+              </Link>
             </div>
 
             <div className="flex items-center gap-2 sm:gap-3">
@@ -255,8 +262,7 @@ export function SiteHeader() {
                 className={cn(
                   iconButtonClass,
                   "hidden lg:inline-flex",
-                  pathname.startsWith("/wishlist") &&
-                    "border-[var(--brand)] text-[var(--brand)]",
+                  pathname.startsWith("/wishlist") && "text-[var(--brand)]",
                 )}
                 href="/wishlist"
               >
@@ -272,7 +278,7 @@ export function SiteHeader() {
                 aria-label="Cart"
                 className={cn(
                   iconButtonClass,
-                  pathname.startsWith("/cart") && "border-[var(--brand)] text-[var(--brand)]",
+                  pathname.startsWith("/cart") && "text-[var(--brand)]",
                 )}
                 href="/cart"
               >
@@ -311,7 +317,7 @@ export function SiteHeader() {
 
           <form
             key={`${pathname}-${keyword}-mobile`}
-            className="flex items-center rounded-full border border-slate-200 bg-white px-5 py-2 shadow-sm shadow-slate-200/60 md:hidden"
+            className="flex items-center rounded-full border border-slate-200 bg-slate-50/80 px-5 py-2 shadow-sm shadow-slate-200/60 md:hidden"
             onSubmit={handleSearchSubmit}
           >
             <input
@@ -341,16 +347,17 @@ export function SiteHeader() {
           >
             <div className="flex items-center justify-between border-b border-slate-200 px-4 py-4">
               <Link
-                className="flex items-center gap-3"
+                className="shrink-0"
                 href="/"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--brand-soft)] text-[var(--brand)]">
-                  <ShoppingCart className="h-6 w-6" />
-                </span>
-                <span className="section-title text-2xl font-bold tracking-[-0.06em] text-slate-950">
-                  {brandName}
-                </span>
+                <Image
+                  alt={SITE_NAME}
+                  className="h-6 w-auto"
+                  height={32}
+                  src="/freshcart-logo.svg"
+                  width={166}
+                />
               </Link>
 
               <button

@@ -19,7 +19,7 @@ const headingFont = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "FreshCart Pro",
+  title: "FreshCart",
   description:
     "A modern e-commerce storefront built with Next.js, TypeScript, and the Route Academy API.",
 };
