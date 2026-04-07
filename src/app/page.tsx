@@ -73,21 +73,21 @@ export default function HomePage() {
           return (
             <article
               key={item.title}
-              className="flex items-center gap-4 rounded-[1.35rem] border border-slate-200 bg-white px-5 py-5 shadow-[0_10px_24px_rgba(15,23,42,0.05)]"
+              className="flex h-20 items-center gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-[0_1px_2px_rgba(0,0,0,0.1),0_1px_3px_rgba(0,0,0,0.1)]"
             >
               <div
                 className={cn(
-                  "flex h-14 w-14 shrink-0 items-center justify-center rounded-full",
+                  "flex h-12 w-12 shrink-0 items-center justify-center rounded-full",
                   featureStyle.iconClassName,
                 )}
               >
-                <Icon className="h-6 w-6" />
+                <Icon className="h-5 w-5" />
               </div>
-              <div>
-                <h2 className="text-[1.35rem] font-semibold text-slate-950">
+              <div className="min-w-0 space-y-0.5">
+                <h2 className="text-base font-semibold leading-6 text-slate-950">
                   {item.title}
                 </h2>
-                <p className="text-[15px] leading-7 text-slate-600">
+                <p className="text-sm leading-5 text-slate-500">
                   {item.description}
                 </p>
               </div>

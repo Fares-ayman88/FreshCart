@@ -83,11 +83,12 @@ export async function getProfile() {
 
 export async function updateProfile(payload: {
   name: string;
+  email: string;
   phone: string;
 }) {
   const { data } = await api.put<{
     message: string;
-    user: { name: string; email: string; role: string };
+    user: { name: string; email: string; role: string; phone?: string };
   }>("/v1/users/updateMe", payload);
   return data;
 }

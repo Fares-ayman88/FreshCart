@@ -97,6 +97,7 @@ export interface AuthResponse {
 }
 
 export interface ShippingAddress {
+  _id?: string;
   details: string;
   phone: string;
   city: string;

@@ -10,8 +10,11 @@ import {
   LogOut,
   Mail,
   Menu,
+  MapPin,
+  Package,
   Phone,
   Search,
+  Settings,
   ShoppingCart,
   Truck,
   UserPlus,
@@ -55,6 +58,38 @@ export function SiteHeader() {
   const cartCount = cartQuery.data?.numOfCartItems ?? 0;
   const wishlistCount = wishlistQuery.data?.data?.length ?? 0;
   const profileLabel = user?.name?.split(" ")[0] ?? "My Account";
+  const accountMenuItems = [
+    {
+      href: "/my-account/settings#profile-information",
+      icon: UserRound,
+      label: "My Profile",
+      isActive: pathname === "/my-account",
+    },
+    {
+      href: "/orders",
+      icon: Package,
+      label: "My Orders",
+      isActive: pathname.startsWith("/orders") || pathname.startsWith("/allorders"),
+    },
+    {
+      href: "/wishlist",
+      icon: Heart,
+      label: "My Wishlist",
+      isActive: pathname.startsWith("/wishlist"),
+    },
+    {
+      href: "/my-account/addresses",
+      icon: MapPin,
+      label: "Addresses",
+      isActive: pathname.startsWith("/my-account/addresses"),
+    },
+    {
+      href: "/my-account/settings#change-password",
+      icon: Settings,
+      label: "Settings",
+      isActive: pathname.startsWith("/my-account/settings"),
+    },
+  ] as const;
 
   useEffect(() => {
     document.body.style.overflow = mobileMenuOpen ? "hidden" : "";
@@ -139,7 +174,7 @@ export function SiteHeader() {
                 <>
                   <Link
                     className="inline-flex items-center gap-2 transition hover:text-[var(--brand)]"
-                    href="/profile"
+                    href="/my-account/settings"
                   >
                     <UserRound className="h-4 w-4" />
                     {profileLabel}
@@ -177,16 +212,6 @@ export function SiteHeader() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between gap-4 py-4 lg:gap-7">
             <div className="flex items-center gap-3">
-              <button
-                aria-expanded={mobileMenuOpen}
-                aria-label="Open navigation menu"
-                className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 text-slate-700 transition hover:border-[var(--brand)] hover:text-[var(--brand)] lg:hidden"
-                type="button"
-                onClick={() => setMobileMenuOpen(true)}
-              >
-                <Menu className="h-5 w-5" />
-              </button>
-
               <Link className="shrink-0" href="/">
                 <Image
                   alt={SITE_NAME}
@@ -261,7 +286,6 @@ export function SiteHeader() {
                 aria-label="Wishlist"
                 className={cn(
                   iconButtonClass,
-                  "hidden lg:inline-flex",
                   pathname.startsWith("/wishlist") && "text-[var(--brand)]",
                 )}
                 href="/wishlist"
@@ -291,48 +315,97 @@ export function SiteHeader() {
               </Link>
 
               {isAuthenticated ? (
-                <Link className={cn(pillButtonClass, "px-3 sm:px-5")} href="/profile">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white/18 text-xs font-bold text-white">
-                    {getInitials(user?.name)}
-                  </span>
-                  <span className="ml-2 hidden lg:inline">{profileLabel}</span>
-                </Link>
+                <>
+                  <div className="group relative hidden lg:block">
+                    <button
+                      aria-haspopup="menu"
+                      aria-label="Open account menu"
+                      className={cn(
+                        "inline-flex h-11 w-11 items-center justify-center rounded-full text-slate-500 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2",
+                        "group-hover:bg-[var(--brand-soft)] group-hover:text-[var(--brand)] group-focus-within:bg-[var(--brand-soft)] group-focus-within:text-[var(--brand)]",
+                      )}
+                      type="button"
+                    >
+                      <span className="flex h-9 w-9 items-center justify-center rounded-full transition">
+                        <UserRound className="h-5 w-5" />
+                      </span>
+                    </button>
+
+                    <div
+                      className="pointer-events-none invisible absolute right-0 top-full z-[70] w-[20rem] pt-4 opacity-0 transition duration-200 group-hover:pointer-events-auto group-hover:visible group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:opacity-100"
+                      role="menu"
+                    >
+                      <div className="overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-[0_24px_60px_rgba(15,23,42,0.18)]">
+                        <div className="flex items-center gap-4 px-5 py-5">
+                          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[var(--brand-soft)] text-[var(--brand)]">
+                            <UserRound className="h-6 w-6" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="truncate text-[1.15rem] font-semibold text-slate-900">
+                              {user?.name ?? profileLabel}
+                            </p>
+                            <p className="truncate text-sm text-slate-400">
+                              {user?.email ?? "Signed in"}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="border-t border-slate-100 px-3 py-3">
+                          {accountMenuItems.map((item) => {
+                            const Icon = item.icon;
+
+                            return (
+                              <Link
+                                key={item.label}
+                                className={cn(
+                                  "flex items-center gap-3 rounded-2xl px-4 py-3 text-[15px] font-medium text-slate-600 transition hover:bg-slate-50 hover:text-slate-950",
+                                  item.isActive && "bg-slate-50 text-slate-950",
+                                )}
+                                href={item.href}
+                                role="menuitem"
+                              >
+                                <Icon className="h-5 w-5 text-slate-400" />
+                                <span>{item.label}</span>
+                              </Link>
+                            );
+                          })}
+                        </div>
+
+                        <div className="border-t border-slate-100 px-3 py-3">
+                          <button
+                            className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-[15px] font-medium text-red-500 transition hover:bg-red-50"
+                            role="menuitem"
+                            type="button"
+                            onClick={handleLogout}
+                          >
+                            <LogOut className="h-5 w-5" />
+                            <span>Sign Out</span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </>
               ) : (
                 <>
-                  <Link
-                    aria-label="Sign in"
-                    className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[var(--brand)] text-white shadow-[0_14px_32px_rgba(10,173,10,0.22)] transition hover:bg-[var(--brand-strong)] lg:hidden"
-                    href="/login"
-                  >
-                    <UserRound className="h-5 w-5" />
-                  </Link>
                   <Link className={cn(pillButtonClass, "hidden lg:inline-flex")} href="/login">
                     <UserRound className="mr-2 h-4 w-4" />
                     Sign In
                   </Link>
                 </>
               )}
+
+              <button
+                aria-expanded={mobileMenuOpen}
+                aria-label="Open navigation menu"
+                className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-[var(--brand)] text-white shadow-[0_14px_32px_rgba(10,173,10,0.22)] transition hover:bg-[var(--brand-strong)] lg:hidden"
+                type="button"
+                onClick={() => setMobileMenuOpen(true)}
+              >
+                <Menu className="h-5 w-5" />
+              </button>
             </div>
           </div>
-
-          <form
-            key={`${pathname}-${keyword}-mobile`}
-            className="flex items-center rounded-full border border-slate-200 bg-slate-50/80 px-5 py-2 shadow-sm shadow-slate-200/60 md:hidden"
-            onSubmit={handleSearchSubmit}
-          >
-            <input
-              defaultValue={keyword}
-              className="h-11 min-w-0 flex-1 border-none bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400"
-              name="keyword"
-              placeholder="Search for products, brands and more..."
-            />
-            <button
-              className="flex h-11 w-11 items-center justify-center rounded-full bg-[var(--brand)] text-white transition hover:bg-[var(--brand-strong)]"
-              type="submit"
-            >
-              <Search className="h-5 w-5" />
-            </button>
-          </form>
         </div>
       </header>
 
@@ -342,10 +415,10 @@ export function SiteHeader() {
           onClick={() => setMobileMenuOpen(false)}
         >
           <aside
-            className="absolute inset-y-0 left-0 flex w-full max-w-sm flex-col bg-white shadow-[0_24px_60px_rgba(15,23,42,0.16)]"
+            className="absolute inset-y-0 right-0 flex w-full max-w-[21rem] flex-col bg-white shadow-[-24px_0_60px_rgba(15,23,42,0.16)]"
             onClick={(event) => event.stopPropagation()}
           >
-            <div className="flex items-center justify-between border-b border-slate-200 px-4 py-4">
+            <div className="flex items-center justify-between border-b border-slate-200 px-4 py-5">
               <Link
                 className="shrink-0"
                 href="/"
@@ -371,143 +444,143 @@ export function SiteHeader() {
             </div>
 
             <div className="flex-1 space-y-6 overflow-y-auto px-4 py-5">
-              <div className="grid gap-3 rounded-[1.75rem] bg-slate-50 p-4 text-sm text-slate-600">
-                <span className="inline-flex items-center gap-2">
-                  <Truck className="h-4 w-4 text-[var(--brand)]" />
-                  Free Shipping on Orders 500 EGP
-                </span>
-                <span className="inline-flex items-center gap-2">
-                  <Gift className="h-4 w-4 text-[var(--brand)]" />
-                  New Arrivals Daily
-                </span>
-              </div>
+              <form
+                key={`${pathname}-${keyword}-mobile-drawer`}
+                className="flex items-center rounded-[1rem] border border-slate-200 bg-slate-50 px-4 py-2 shadow-sm shadow-slate-200/60"
+                onSubmit={handleSearchSubmit}
+              >
+                <input
+                  defaultValue={keyword}
+                  className="h-10 min-w-0 flex-1 border-none bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400"
+                  name="keyword"
+                  placeholder="Search products..."
+                />
+                <button
+                  className="flex h-10 w-10 items-center justify-center rounded-[0.9rem] bg-[var(--brand)] text-white transition hover:bg-[var(--brand-strong)]"
+                  type="submit"
+                >
+                  <Search className="h-4 w-4" />
+                </button>
+              </form>
 
-              <nav className="grid gap-2">
+              <nav className="border-y border-slate-100">
                 {NAV_LINKS.map((link) => {
                   const isActive = isLinkActive(link.href);
-                  const isCategoryLink = link.label === "Categories";
 
                   return (
                     <Link
                       key={link.href}
                       className={cn(
-                        mobileNavLinkClass,
-                        isActive && "border-[var(--brand)] bg-[var(--brand-soft)] text-[var(--brand)]",
+                        "flex items-center justify-between border-b border-slate-100 py-4 text-[1.05rem] font-medium text-slate-700 transition last:border-b-0 hover:text-[var(--brand)]",
+                        isActive && "text-[var(--brand)]",
                       )}
                       href={link.href}
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       <span>{link.label}</span>
-                      {isCategoryLink ? (
-                        <ChevronDown className="h-4 w-4" />
-                      ) : (
-                        <span className="text-slate-300">/</span>
-                      )}
+                      <span className="text-slate-300">/</span>
                     </Link>
                   );
                 })}
               </nav>
 
-              <div className="rounded-[1.75rem] border border-slate-200 p-4">
-                <div className="mb-4 flex items-center gap-3">
-                  <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[var(--brand-soft)] text-[var(--brand)]">
-                    <Headphones className="h-5 w-5" />
-                  </span>
-                  <div className="text-sm leading-5">
-                    <p className="text-slate-500">Support</p>
-                    <p className="font-semibold text-slate-900">24/7 Help</p>
-                  </div>
-                </div>
-
-                <div className="grid gap-3 text-sm text-slate-600">
-                  <a
-                    className="inline-flex items-center gap-2 transition hover:text-[var(--brand)]"
-                    href="tel:+18001234567"
-                  >
-                    <Phone className="h-4 w-4" />
-                    +1 (800) 123-4567
-                  </a>
-                  <a
-                    className="inline-flex items-center gap-2 transition hover:text-[var(--brand)]"
-                    href="mailto:support@freshcart.com"
-                  >
-                    <Mail className="h-4 w-4" />
-                    support@freshcart.com
-                  </a>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2 border-b border-slate-100 pb-5">
                 <Link
-                  className="relative flex items-center justify-center gap-2 rounded-2xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700 transition hover:border-[var(--brand)] hover:text-[var(--brand)]"
+                  className="flex items-center gap-4 rounded-[1rem] px-2 py-3 text-[1.05rem] font-medium text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"
                   href="/wishlist"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  <Heart className="h-4 w-4" />
-                  Wishlist
+                  <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#fff5f5] text-[#ff5858]">
+                    <Heart className="h-5 w-5" />
+                  </span>
+                  <span className="flex-1">Wishlist</span>
                   {isAuthenticated && wishlistCount ? (
-                    <span className="absolute right-3 top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-[var(--brand)] px-1 text-[10px] font-semibold text-white">
+                    <span className="rounded-full bg-[var(--brand)] px-2 py-1 text-xs font-semibold text-white">
                       {wishlistCount}
                     </span>
                   ) : null}
                 </Link>
 
                 <Link
-                  className="relative flex items-center justify-center gap-2 rounded-2xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700 transition hover:border-[var(--brand)] hover:text-[var(--brand)]"
+                  className="flex items-center gap-4 rounded-[1rem] px-2 py-3 text-[1.05rem] font-medium text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"
                   href="/cart"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  <ShoppingCart className="h-4 w-4" />
-                  Cart
+                  <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[var(--brand-soft)] text-[var(--brand)]">
+                    <ShoppingCart className="h-5 w-5" />
+                  </span>
+                  <span className="flex-1">Cart</span>
                   {isAuthenticated && cartCount ? (
-                    <span className="absolute right-3 top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-[var(--brand)] px-1 text-[10px] font-semibold text-white">
+                    <span className="rounded-full bg-[var(--brand)] px-2 py-1 text-xs font-semibold text-white">
                       {cartCount}
                     </span>
                   ) : null}
                 </Link>
-              </div>
 
-              {isAuthenticated ? (
-                <div className="grid gap-3">
+                {isAuthenticated ? (
                   <Link
-                    className={cn(pillButtonClass, "justify-center")}
-                    href="/profile"
+                    className="flex items-center gap-4 rounded-[1rem] px-2 py-3 text-[1.05rem] font-medium text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"
+                    href="/my-account/settings"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white/18 text-xs font-bold text-white">
-                      {getInitials(user?.name)}
+                    <span className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-50 text-slate-500">
+                      <UserRound className="h-5 w-5" />
                     </span>
-                    <span className="ml-2">{user?.name ?? "My profile"}</span>
+                    <span>{user?.name ?? "My Account"}</span>
                   </Link>
+                ) : (
+                  <div className="grid gap-3 pt-1">
+                    <Link
+                      className={cn(pillButtonClass, "justify-center")}
+                      href="/login"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <UserRound className="mr-2 h-4 w-4" />
+                      Sign In
+                    </Link>
+                    <Link
+                      className="inline-flex h-11 items-center justify-center rounded-full border border-slate-200 px-5 text-sm font-medium text-slate-700 transition hover:border-[var(--brand)] hover:text-[var(--brand)]"
+                      href="/signup"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <UserPlus className="mr-2 h-4 w-4" />
+                      Sign Up
+                    </Link>
+                  </div>
+                )}
+
+                {isAuthenticated ? (
                   <button
-                    className="inline-flex h-11 items-center justify-center rounded-full border border-slate-200 px-5 text-sm font-medium text-slate-700 transition hover:border-[var(--brand)] hover:text-[var(--brand)]"
+                    className="flex w-full items-center gap-4 rounded-[1rem] px-2 py-3 text-left text-[1.05rem] font-medium text-[#ff3b30] transition hover:bg-red-50"
                     type="button"
                     onClick={handleLogout}
                   >
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Logout
+                    <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#fff5f5] text-[#ff3b30]">
+                      <LogOut className="h-5 w-5" />
+                    </span>
+                    <span>Sign Out</span>
                   </button>
+                ) : null}
+              </div>
+
+              <div className="rounded-[1.2rem] border border-slate-200 bg-slate-50 px-4 py-4">
+                <div className="flex items-start gap-3">
+                  <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[var(--brand-soft)] text-[var(--brand)]">
+                    <Headphones className="h-5 w-5" />
+                  </span>
+                  <div>
+                    <p className="text-[1.02rem] font-semibold text-slate-900">
+                      Need Help?
+                    </p>
+                    <a
+                      className="mt-1 inline-flex text-sm font-medium text-[var(--brand)]"
+                      href="mailto:support@freshcart.com"
+                    >
+                      Contact Support
+                    </a>
+                  </div>
                 </div>
-              ) : (
-                <div className="grid gap-3">
-                  <Link
-                    className={cn(pillButtonClass, "justify-center")}
-                    href="/login"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <UserRound className="mr-2 h-4 w-4" />
-                    Sign In
-                  </Link>
-                  <Link
-                    className="inline-flex h-11 items-center justify-center rounded-full border border-slate-200 px-5 text-sm font-medium text-slate-700 transition hover:border-[var(--brand)] hover:text-[var(--brand)]"
-                    href="/signup"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <UserPlus className="mr-2 h-4 w-4" />
-                    Sign Up
-                  </Link>
-                </div>
-              )}
+              </div>
             </div>
           </aside>
         </div>
