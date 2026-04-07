@@ -40,47 +40,50 @@ export function HeroSlider() {
   }, [emblaApi]);
 
   return (
-    <section className="-mt-8">
+    <section className="relative left-1/2 -mt-8 w-screen max-w-none -translate-x-1/2">
       <div className="relative overflow-hidden bg-[var(--brand)]">
         <div ref={emblaRef} className="overflow-hidden">
           <div className="flex">
             {HERO_SLIDES.map((slide) => (
               <div key={slide.id} className="min-w-0 flex-[0_0_100%]">
-                <div className="relative min-h-[21rem] sm:min-h-[25rem] lg:min-h-[31.25rem]">
+                <div className="relative h-[21rem] overflow-hidden sm:h-[25rem] lg:h-[31.25rem]">
                   <Image
                     alt={slide.title}
-                    className="object-cover object-center"
+                    className="scale-[1.06] object-cover object-[center_42%]"
                     fill
                     priority={slide.id === HERO_SLIDES[0].id}
                     sizes="100vw"
                     src={slide.image}
                   />
-                  <div className="absolute inset-0 bg-[rgba(10,173,10,0.66)]" />
+                  <div className="absolute !w-full inset-0 bg-[rgba(10,173,10,0.66)]" />
                   <div className="absolute inset-0 bg-[linear-gradient(90deg,_rgba(6,120,6,0.34)_0%,_rgba(6,120,6,0.18)_38%,_rgba(6,120,6,0.08)_60%,_transparent_100%)]" />
 
-                  <div className="relative z-10 flex min-h-[21rem] max-w-[32rem] flex-col justify-center px-6 py-12 text-white sm:min-h-[25rem] sm:px-10 lg:min-h-[31.25rem] lg:px-14">
-                    <div className="space-y-4 sm:space-y-5">
-                      <h1 className="section-title max-w-[16rem] text-[2.35rem] font-bold leading-[1.02] tracking-[-0.05em] text-white sm:max-w-[18rem] sm:text-[3rem] lg:max-w-[19rem] lg:text-[3.25rem]">
-                        {slide.title}
-                      </h1>
-                      <p className="max-w-md text-lg font-medium leading-7 text-white/95 sm:text-[1.05rem]">
-                        {slide.description}
-                      </p>
-                    </div>
+                  <div className="relative z-10 mx-auto flex h-[21rem] w-full max-w-7xl  sm:h-[25rem] sm:px-6 lg:h-[31.25rem] lg:px-8">
+                    <div className="flex max-w-[32rem] flex-col justify-center py-12 text-white">
+                      <div className="space-y-4 sm:space-y-5">
+                        <h1 className="section-title max-w-[16rem] text-[2.35rem] font-bold leading-[1.02] tracking-[-0.05em] text-white sm:max-w-[18rem] sm:text-[3rem] lg:max-w-[19rem] lg:text-[3.25rem]">
+                          {slide.title}
+                        </h1>
+                        <p className="max-w-md text-lg font-medium leading-7 text-white/95 sm:text-[1.05rem]">
+                          {slide.description}
+                        </p>
+                      </div>
 
-                    <div className="mt-8 flex flex-wrap items-center gap-3">
-                      <Link
-                        className="inline-flex h-14 items-center justify-center rounded-[0.85rem] border border-white/80 bg-white px-8 text-lg font-semibold text-[var(--brand)] transition hover:bg-slate-100"
-                        href={slide.primaryAction.href}
-                      >
-                        {slide.primaryAction.label}
-                      </Link>
-                      <Link
-                        className="inline-flex h-14 items-center justify-center rounded-[0.85rem] border border-white/70 bg-transparent px-8 text-lg font-semibold text-white transition hover:bg-white/10"
-                        href={slide.secondaryAction.href}
-                      >
-                        {slide.secondaryAction.label}
-                      </Link>
+                      <div className="mt-8 flex flex-wrap items-center gap-3">
+                        <Link
+                          className="inline-flex h-[3.3rem] min-w-[8.9rem] items-center justify-center rounded-[0.8rem] bg-white px-7 text-[1.05rem] font-semibold tracking-[-0.02em] !text-[var(--brand)] transition hover:bg-slate-100"
+                          href={slide.primaryAction.href}
+                          style={{ color: "var(--brand)" }}
+                        >
+                          {slide.primaryAction.label}
+                        </Link>
+                        <Link
+                          className="inline-flex h-[3.3rem] min-w-[9.4rem] items-center justify-center rounded-[0.8rem] border border-white/55 bg-transparent px-7 text-[1.05rem] font-semibold tracking-[-0.02em] text-white transition hover:bg-white/10"
+                          href={slide.secondaryAction.href}
+                        >
+                          {slide.secondaryAction.label}
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 </div>
