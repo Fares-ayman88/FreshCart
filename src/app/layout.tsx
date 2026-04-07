@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { DM_Sans, Space_Grotesk } from "next/font/google";
+import Script from "next/script";
 
 import { Providers } from "@/components/providers";
 import { SiteFooter } from "@/components/layout/site-footer";
@@ -32,6 +33,44 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${bodyFont.variable} ${headingFont.variable}`}>
+        <Script id="strip-extension-hydration-attributes" strategy="beforeInteractive">
+          {`(() => {
+  const attributeNames = ["cz-shortcut-listen", "fdprocessedid"];
+
+  const stripInjectedAttributes = () => {
+    if (document.body) {
+      document.body.removeAttribute("cz-shortcut-listen");
+    }
+
+    for (const attributeName of attributeNames) {
+      document
+        .querySelectorAll(\`[\${attributeName}]\`)
+        .forEach((element) => element.removeAttribute(attributeName));
+    }
+  };
+
+  stripInjectedAttributes();
+
+  const observer = new MutationObserver(() => {
+    stripInjectedAttributes();
+  });
+
+  observer.observe(document.documentElement, {
+    attributes: true,
+    childList: true,
+    subtree: true,
+  });
+
+  window.addEventListener(
+    "load",
+    () => {
+      stripInjectedAttributes();
+      observer.disconnect();
+    },
+    { once: true },
+  );
+})();`}
+        </Script>
         <Providers>
           <div className="relative min-h-screen overflow-x-hidden bg-[var(--background)] text-[var(--foreground)]">
             <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[28rem] bg-[radial-gradient(circle_at_top,_rgba(10,173,10,0.18),_transparent_48%),linear-gradient(180deg,_rgba(244,248,236,0.95),_rgba(255,255,255,1))]" />
