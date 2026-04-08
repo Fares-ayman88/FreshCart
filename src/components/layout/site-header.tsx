@@ -157,9 +157,7 @@ export function SiteHeader() {
   const navLinkClass =
     "inline-flex items-center gap-1 text-[15px] font-medium text-slate-700 transition hover:text-[var(--brand)]";
   const iconButtonClass =
-    "relative inline-flex h-11 w-11 items-center justify-center rounded-full border border-transparent bg-transparent text-[#667085] transition duration-200 hover:-translate-y-0.5 hover:border-slate-200 hover:bg-white hover:text-[var(--brand)] hover:shadow-[0_14px_26px_rgba(148,163,184,0.28)]";
-  const iconButtonFocusClass =
-    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2";
+    "relative inline-flex h-11 w-11 items-center justify-center rounded-full border border-transparent bg-transparent text-slate-700 transition duration-200 hover:-translate-y-0.5 hover:border-slate-200 hover:bg-white hover:text-[var(--brand)] hover:shadow-[0_14px_26px_rgba(148,163,184,0.28)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2";
   const activeIconButtonClass =
     "border-slate-200 bg-white text-[var(--brand)] shadow-[0_12px_24px_rgba(148,163,184,0.2)]";
   const pillButtonClass =
@@ -313,7 +311,6 @@ export function SiteHeader() {
                 aria-label="Wishlist"
                 className={cn(
                   iconButtonClass,
-                  iconButtonFocusClass,
                   pathname.startsWith("/wishlist") && activeIconButtonClass,
                 )}
                 href="/wishlist"
@@ -330,7 +327,6 @@ export function SiteHeader() {
                 aria-label="Cart"
                 className={cn(
                   iconButtonClass,
-                  iconButtonFocusClass,
                   pathname.startsWith("/cart") && activeIconButtonClass,
                 )}
                 href="/cart"
@@ -352,8 +348,6 @@ export function SiteHeader() {
                     }
                     className={cn(
                       iconButtonClass,
-                      iconButtonFocusClass,
-                      "group-hover:border-slate-200 group-hover:bg-white group-hover:text-[var(--brand)] group-hover:shadow-[0_14px_26px_rgba(148,163,184,0.28)] group-focus-within:border-slate-200 group-focus-within:bg-white group-focus-within:text-[var(--brand)] group-focus-within:shadow-[0_14px_26px_rgba(148,163,184,0.28)]",
                       isAccountRoute && activeIconButtonClass,
                     )}
                     type="button"
