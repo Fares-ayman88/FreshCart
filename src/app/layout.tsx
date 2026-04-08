@@ -77,11 +77,12 @@ export default function RootLayout({
             <div className="pointer-events-none absolute inset-y-0 right-0 -z-10 hidden w-96 bg-[radial-gradient(circle_at_center,_rgba(13,148,136,0.12),_transparent_60%)] lg:block" />
             <Suspense
               fallback={
-                <div className="sticky top-0 z-40 h-32 border-b border-white/70 bg-white/80 backdrop-blur-2xl" />
+                <div className="fixed inset-x-0 top-0 z-40 h-32 border-b border-white/70 bg-white/80 backdrop-blur-2xl" />
               }
             >
               <SiteHeader />
             </Suspense>
+            <div className="h-[7.7rem] md:h-[8rem] lg:h-[8.55rem]" />
             <main className="mx-auto flex min-h-[calc(100vh-12rem)] w-full max-w-7xl flex-col px-4 pb-16 pt-8 sm:px-6 lg:px-8">
               {children}
             </main>

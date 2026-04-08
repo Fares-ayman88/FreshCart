@@ -18,6 +18,7 @@ import { ProductCard } from "@/components/products/product-card";
 import { buttonVariants } from "@/components/ui/button";
 import { getCategories, getProducts, queryKeys } from "@/lib/api";
 import { FEATURE_HIGHLIGHTS } from "@/lib/constants";
+import type { Category } from "@/lib/types";
 import { cn, extractErrorMessage } from "@/lib/utils";
 
 const featureStyles = [
@@ -39,13 +40,39 @@ const featureStyles = [
   },
 ] as const;
 
+const FEATURED_CATEGORY_ORDER = [
+  "Music",
+  "Men's Fashion",
+  "Women's Fashion",
+  "SuperMarket",
+  "Baby & Toys",
+  "Home",
+  "Books",
+  "Beauty & Health",
+  "Mobiles",
+  "Electronics",
+] as const;
+
+function sortHomeCategories(categories: Category[]) {
+  const categoryOrder = new Map<string, number>(
+    FEATURED_CATEGORY_ORDER.map((name, index) => [name, index]),
+  );
+
+  return [...categories].sort((firstCategory, secondCategory) => {
+    const firstRank = categoryOrder.get(firstCategory.name) ?? Number.MAX_SAFE_INTEGER;
+    const secondRank = categoryOrder.get(secondCategory.name) ?? Number.MAX_SAFE_INTEGER;
+
+    return firstRank - secondRank;
+  });
+}
+
 export default function HomePage() {
   const [keyword, setKeyword] = useState("");
   const deferredKeyword = useDeferredValue(keyword);
 
   const categoriesQuery = useQuery({
     queryKey: queryKeys.categories,
-    queryFn: () => getCategories({ limit: 8 }),
+    queryFn: () => getCategories({ limit: 10 }),
   });
 
   const productsQuery = useQuery({
@@ -60,6 +87,7 @@ export default function HomePage() {
           : { limit: 8, sort: "-updatedAt" },
       ),
   });
+  const homeCategories = sortHomeCategories(categoriesQuery.data?.data ?? []).slice(0, 10);
 
   return (
     <div className="space-y-12">
@@ -96,31 +124,30 @@ export default function HomePage() {
         })}
       </section>
 
-      <section className="space-y-6">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div className="space-y-2">
-            <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[var(--brand)]">
-              Browse by category
-            </p>
-            <h2 className="section-title text-3xl font-bold text-slate-950">
-              Start with the aisle that fits your mood.
+      <section className="space-y-5 md:space-y-6">
+        <div className="flex flex-col gap-4 py-2 sm:flex-row sm:items-center sm:justify-between md:py-4">
+          <div className="flex items-center gap-3">
+            <span className="h-6 w-1 shrink-0 rounded-full bg-[var(--brand)] md:h-7" />
+            <h2 className="section-title text-[1.9rem] font-bold leading-none text-slate-950 md:text-[2rem] lg:text-[2.15rem]">
+              Shop By <span className="text-[var(--brand)]">Category</span>
             </h2>
           </div>
+
           <Link
-            className={buttonVariants({ variant: "outline" })}
+            className="inline-flex items-center gap-2 self-end text-sm font-medium text-[#16A34A] transition hover:text-[var(--brand-strong)] sm:self-auto"
             href="/categories"
           >
-            View all categories
-            <ArrowRight className="ml-2 h-4 w-4" />
+            View All Categories
+            <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
 
         {categoriesQuery.isLoading ? (
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            {Array.from({ length: 4 }).map((_, index) => (
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 min-[960px]:grid-cols-6">
+            {Array.from({ length: 10 }).map((_, index) => (
               <div
                 key={index}
-                className="h-44 animate-pulse rounded-[1.75rem] bg-white/70"
+                className="h-[8.85rem] animate-pulse rounded-xl border border-slate-100 bg-white/80 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_3px_12px_rgba(15,23,42,0.05)]"
               />
             ))}
           </div>
@@ -129,34 +156,25 @@ export default function HomePage() {
             {extractErrorMessage(categoriesQuery.error)}
           </div>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            {categoriesQuery.data?.data.map((category) => (
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 min-[960px]:grid-cols-6">
+            {homeCategories.map((category) => (
               <Link
                 key={category._id}
-                className="surface-card group relative overflow-hidden rounded-[1.75rem] p-5"
+                className="group flex min-h-[8.4rem] flex-col items-center justify-center gap-3 rounded-xl border border-slate-100 bg-white px-3 py-4 text-center shadow-[0_1px_2px_rgba(15,23,42,0.04),0_3px_12px_rgba(15,23,42,0.05)] transition duration-200 hover:-translate-y-0.5 hover:border-[var(--brand)]/25 hover:shadow-[0_14px_28px_rgba(15,23,42,0.08)] md:min-h-[8.85rem]"
                 href={`/categories?category=${category._id}`}
               >
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(10,173,10,0.14),_transparent_45%)] opacity-0 transition group-hover:opacity-100" />
-                <div className="relative flex items-center gap-4">
-                  <div className="relative h-20 w-20 overflow-hidden rounded-2xl bg-white">
-                    <Image
-                      alt={category.name}
-                      className="h-full w-full object-cover"
-                      fill
-                      sizes="80px"
-                      src={category.image}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <h3 className="text-lg font-semibold text-slate-950">
-                      {category.name}
-                    </h3>
-                    <span className="inline-flex items-center gap-1 text-sm font-medium text-[var(--brand)]">
-                      Explore now
-                      <ArrowRight className="h-4 w-4" />
-                    </span>
-                  </div>
+                <div className="relative h-[3.75rem] w-[3.75rem] overflow-hidden rounded-full bg-[#edf9ec] shadow-[inset_0_0_0_1px_rgba(226,232,240,0.85)] transition duration-200 group-hover:scale-[1.03] md:h-[3.9rem] md:w-[3.9rem]">
+                  <Image
+                    alt={category.name}
+                    className="h-full w-full object-cover"
+                    fill
+                    sizes="64px"
+                    src={category.image}
+                  />
                 </div>
+                <h3 className="text-sm font-medium leading-5 text-slate-700 md:text-[0.95rem]">
+                  {category.name}
+                </h3>
               </Link>
             ))}
           </div>
