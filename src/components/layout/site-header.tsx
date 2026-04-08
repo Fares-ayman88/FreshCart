@@ -28,7 +28,7 @@ import { toast } from "sonner";
 
 import { getCart, getWishlist, queryKeys } from "@/lib/api";
 import { NAV_LINKS, SITE_NAME } from "@/lib/constants";
-import { cn, getInitials } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/auth-store";
 
 export function SiteHeader() {
@@ -36,6 +36,7 @@ export function SiteHeader() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [accountHash, setAccountHash] = useState("");
   const token = useAuthStore((state) => state.token);
   const user = useAuthStore((state) => state.user);
   const hydrated = useAuthStore((state) => state.hydrated);
@@ -57,13 +58,19 @@ export function SiteHeader() {
   const isAuthenticated = Boolean(token);
   const cartCount = cartQuery.data?.numOfCartItems ?? 0;
   const wishlistCount = wishlistQuery.data?.data?.length ?? 0;
-  const profileLabel = user?.name?.split(" ")[0] ?? "My Account";
+  const accountName = user?.name ?? "My Account";
+  const accountEmail = user?.email ?? "Signed in";
+  const isAccountSettingsRoute = pathname.startsWith("/my-account/settings");
+  const isProfileSectionActive =
+    isAccountSettingsRoute && accountHash !== "#change-password";
+  const isSettingsSectionActive =
+    isAccountSettingsRoute && accountHash === "#change-password";
   const accountMenuItems = [
     {
-      href: "/my-account/settings#profile-information",
+      href: "/profile",
       icon: UserRound,
       label: "My Profile",
-      isActive: pathname === "/my-account",
+      isActive: isProfileSectionActive,
     },
     {
       href: "/orders",
@@ -78,16 +85,16 @@ export function SiteHeader() {
       isActive: pathname.startsWith("/wishlist"),
     },
     {
-      href: "/my-account/addresses",
+      href: "/addresses",
       icon: MapPin,
       label: "Addresses",
       isActive: pathname.startsWith("/my-account/addresses"),
     },
     {
-      href: "/my-account/settings#change-password",
+      href: "/settings",
       icon: Settings,
       label: "Settings",
-      isActive: pathname.startsWith("/my-account/settings"),
+      isActive: isSettingsSectionActive,
     },
   ] as const;
 
@@ -98,6 +105,19 @@ export function SiteHeader() {
       document.body.style.overflow = "";
     };
   }, [mobileMenuOpen]);
+
+  useEffect(() => {
+    const syncAccountHash = () => {
+      setAccountHash(window.location.hash);
+    };
+
+    syncAccountHash();
+    window.addEventListener("hashchange", syncAccountHash);
+
+    return () => {
+      window.removeEventListener("hashchange", syncAccountHash);
+    };
+  }, [pathname]);
 
   function handleSearchSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -132,11 +152,9 @@ export function SiteHeader() {
   const navLinkClass =
     "inline-flex items-center gap-1 text-[15px] font-medium text-slate-700 transition hover:text-[var(--brand)]";
   const iconButtonClass =
-    "relative inline-flex h-11 w-11 items-center justify-center rounded-full text-slate-500 transition hover:bg-slate-100 hover:text-[var(--brand)]";
+    "relative inline-flex h-11 w-11 items-center justify-center rounded-full border border-transparent text-slate-500 transition duration-200 hover:-translate-y-0.5 hover:border-slate-200 hover:bg-white hover:text-[var(--brand)] hover:shadow-[0_14px_28px_rgba(15,23,42,0.08)]";
   const pillButtonClass =
     "inline-flex h-11 items-center justify-center rounded-full bg-[var(--brand)] px-5 text-sm font-semibold text-white shadow-[0_14px_32px_rgba(10,173,10,0.22)] transition hover:bg-[var(--brand-strong)]";
-  const mobileNavLinkClass =
-    "flex items-center justify-between rounded-2xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700 transition hover:border-[var(--brand)] hover:bg-[var(--brand-soft)] hover:text-[var(--brand)]";
 
   return (
     <>
@@ -174,10 +192,10 @@ export function SiteHeader() {
                 <>
                   <Link
                     className="inline-flex items-center gap-2 transition hover:text-[var(--brand)]"
-                    href="/my-account/settings"
+                    href="/profile"
                   >
                     <UserRound className="h-4 w-4" />
-                    {profileLabel}
+                    {accountName}
                   </Link>
                   <button
                     className="inline-flex items-center gap-2 transition hover:text-[var(--brand)]"
@@ -185,7 +203,7 @@ export function SiteHeader() {
                     onClick={handleLogout}
                   >
                     <LogOut className="h-4 w-4" />
-                    Logout
+                    Sign Out
                   </button>
                 </>
               ) : (
@@ -315,77 +333,81 @@ export function SiteHeader() {
               </Link>
 
               {isAuthenticated ? (
-                <>
-                  <div className="group relative hidden lg:block">
-                    <button
-                      aria-haspopup="menu"
-                      aria-label="Open account menu"
-                      className={cn(
-                        "inline-flex h-11 w-11 items-center justify-center rounded-full text-slate-500 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2",
-                        "group-hover:bg-[var(--brand-soft)] group-hover:text-[var(--brand)] group-focus-within:bg-[var(--brand-soft)] group-focus-within:text-[var(--brand)]",
-                      )}
-                      type="button"
-                    >
-                      <span className="flex h-9 w-9 items-center justify-center rounded-full transition">
-                        <UserRound className="h-5 w-5" />
-                      </span>
-                    </button>
+                <div className="group relative hidden lg:block">
+                  <button
+                    aria-haspopup="menu"
+                    aria-label={
+                      user?.name ? `Open ${user.name} account menu` : "Open account menu"
+                    }
+                    className="inline-flex h-[3.2rem] w-[3.2rem] items-center justify-center rounded-full border border-slate-200 bg-white text-[var(--brand)] shadow-[0_10px_28px_rgba(15,23,42,0.06)] transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2 group-hover:-translate-y-0.5 group-hover:border-[var(--brand)]/20 group-hover:shadow-[0_18px_36px_rgba(10,173,10,0.18)] group-focus-within:-translate-y-0.5 group-focus-within:border-[var(--brand)]/20 group-focus-within:shadow-[0_18px_36px_rgba(10,173,10,0.18)]"
+                    type="button"
+                  >
+                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--brand-soft)]/90 transition duration-200 group-hover:bg-[var(--brand-soft)] group-focus-within:bg-[var(--brand-soft)]">
+                      <UserRound className="h-5 w-5" />
+                    </span>
+                  </button>
 
-                    <div
-                      className="pointer-events-none invisible absolute right-0 top-full z-[70] w-[20rem] pt-4 opacity-0 transition duration-200 group-hover:pointer-events-auto group-hover:visible group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:opacity-100"
-                      role="menu"
-                    >
-                      <div className="overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-[0_24px_60px_rgba(15,23,42,0.18)]">
-                        <div className="flex items-center gap-4 px-5 py-5">
-                          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[var(--brand-soft)] text-[var(--brand)]">
-                            <UserRound className="h-6 w-6" />
-                          </div>
-                          <div className="min-w-0">
-                            <p className="truncate text-[1.15rem] font-semibold text-slate-900">
-                              {user?.name ?? profileLabel}
-                            </p>
-                            <p className="truncate text-sm text-slate-400">
-                              {user?.email ?? "Signed in"}
-                            </p>
-                          </div>
+                  <div
+                    className="pointer-events-none invisible absolute right-0 top-full z-[70] w-[21rem] translate-y-2 pt-4 opacity-0 transition duration-200 group-hover:pointer-events-auto group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100"
+                    role="menu"
+                  >
+                    <div className="absolute right-5 top-[0.65rem] h-4 w-4 rotate-45 rounded-[0.35rem] border-l border-t border-slate-200 bg-white" />
+
+                    <div className="relative overflow-hidden rounded-[1.8rem] border border-slate-200 bg-white shadow-[0_28px_72px_rgba(15,23,42,0.18)]">
+                      <div className="flex items-center gap-4 px-5 py-5">
+                        <div className="flex h-[3.25rem] w-[3.25rem] shrink-0 items-center justify-center rounded-full bg-[var(--brand-soft)] text-[var(--brand)]">
+                          <UserRound className="h-6 w-6" />
                         </div>
+                        <div className="min-w-0">
+                          <p className="truncate text-[1.15rem] font-semibold text-slate-900">
+                            {accountName}
+                          </p>
+                          <p className="truncate text-sm text-slate-400">
+                            {accountEmail}
+                          </p>
+                        </div>
+                      </div>
 
-                        <div className="border-t border-slate-100 px-3 py-3">
-                          {accountMenuItems.map((item) => {
-                            const Icon = item.icon;
+                      <div className="border-t border-slate-100 px-3 py-3">
+                        {accountMenuItems.map((item) => {
+                          const Icon = item.icon;
 
-                            return (
-                              <Link
-                                key={item.label}
+                          return (
+                            <Link
+                              key={item.label}
+                              className={cn(
+                                "group/item flex items-center gap-3 rounded-[1.15rem] px-4 py-3.5 text-[15px] font-medium text-slate-600 transition duration-200 hover:bg-[var(--brand-soft)] hover:text-slate-950",
+                                item.isActive && "bg-[var(--brand-soft)] text-slate-950",
+                              )}
+                              href={item.href}
+                              role="menuitem"
+                            >
+                              <Icon
                                 className={cn(
-                                  "flex items-center gap-3 rounded-2xl px-4 py-3 text-[15px] font-medium text-slate-600 transition hover:bg-slate-50 hover:text-slate-950",
-                                  item.isActive && "bg-slate-50 text-slate-950",
+                                  "h-5 w-5 text-slate-400 transition duration-200 group-hover/item:text-[var(--brand)]",
+                                  item.isActive && "text-[var(--brand)]",
                                 )}
-                                href={item.href}
-                                role="menuitem"
-                              >
-                                <Icon className="h-5 w-5 text-slate-400" />
-                                <span>{item.label}</span>
-                              </Link>
-                            );
-                          })}
-                        </div>
+                              />
+                              <span>{item.label}</span>
+                            </Link>
+                          );
+                        })}
+                      </div>
 
-                        <div className="border-t border-slate-100 px-3 py-3">
-                          <button
-                            className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-[15px] font-medium text-red-500 transition hover:bg-red-50"
-                            role="menuitem"
-                            type="button"
-                            onClick={handleLogout}
-                          >
-                            <LogOut className="h-5 w-5" />
-                            <span>Sign Out</span>
-                          </button>
-                        </div>
+                      <div className="border-t border-slate-100 px-3 py-3">
+                        <button
+                          className="flex w-full items-center gap-3 rounded-[1.15rem] px-4 py-3.5 text-[15px] font-medium text-red-500 transition duration-200 hover:bg-red-50"
+                          role="menuitem"
+                          type="button"
+                          onClick={handleLogout}
+                        >
+                          <LogOut className="h-5 w-5" />
+                          <span>Sign Out</span>
+                        </button>
                       </div>
                     </div>
                   </div>
-                </>
+                </div>
               ) : (
                 <>
                   <Link className={cn(pillButtonClass, "hidden lg:inline-flex")} href="/login">
@@ -520,13 +542,13 @@ export function SiteHeader() {
                 {isAuthenticated ? (
                   <Link
                     className="flex items-center gap-4 rounded-[1rem] px-2 py-3 text-[1.05rem] font-medium text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"
-                    href="/my-account/settings"
+                    href="/profile"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     <span className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-50 text-slate-500">
                       <UserRound className="h-5 w-5" />
                     </span>
-                    <span>{user?.name ?? "My Account"}</span>
+                    <span>{accountName}</span>
                   </Link>
                 ) : (
                   <div className="grid gap-3 pt-1">

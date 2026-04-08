@@ -60,12 +60,13 @@ export function MyAccountShell({ children }: PropsWithChildren) {
     queryFn: getProfile,
     enabled: canRender,
   });
+  const profile = profileQuery.data?.data ?? null;
 
   if (!hydrated || !canRender) {
     return <div className="h-[60vh] animate-pulse rounded-[2rem] bg-white/70" />;
   }
 
-  if (profileQuery.isLoading && !profileQuery.data?.data) {
+  if (profileQuery.isLoading && !profile) {
     return <div className="h-[70vh] animate-pulse rounded-[2rem] bg-white/70" />;
   }
 
@@ -76,8 +77,6 @@ export function MyAccountShell({ children }: PropsWithChildren) {
       </div>
     );
   }
-
-  const profile = profileQuery.data?.data ?? null;
 
   return (
     <MyAccountContext.Provider value={{ profile }}>

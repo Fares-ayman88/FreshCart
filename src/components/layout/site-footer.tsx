@@ -1,17 +1,17 @@
 import Image from "next/image";
 import Link from "next/link";
 import {
-  Facebook,
+  Camera,
+  CirclePlay,
+  Globe,
   Headphones,
-  Instagram,
   Mail,
   MapPin,
   Phone,
   RotateCcw,
+  Send,
   ShieldCheck,
   Truck,
-  Twitter,
-  Youtube,
 } from "lucide-react";
 
 const footerHighlights = [
@@ -70,10 +70,10 @@ const legalLinks = [
 ] as const;
 
 const socialLinks = [
-  { href: "https://www.facebook.com", icon: Facebook, label: "Facebook" },
-  { href: "https://x.com", icon: Twitter, label: "Twitter" },
-  { href: "https://www.instagram.com", icon: Instagram, label: "Instagram" },
-  { href: "https://www.youtube.com", icon: Youtube, label: "YouTube" },
+  { href: "https://www.facebook.com", icon: Globe, label: "Facebook" },
+  { href: "https://x.com", icon: Send, label: "Twitter" },
+  { href: "https://www.instagram.com", icon: Camera, label: "Instagram" },
+  { href: "https://www.youtube.com", icon: CirclePlay, label: "YouTube" },
 ] as const;
 
 export function SiteFooter() {
