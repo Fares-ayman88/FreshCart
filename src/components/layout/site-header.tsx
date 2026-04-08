@@ -60,6 +60,11 @@ export function SiteHeader() {
   const wishlistCount = wishlistQuery.data?.data?.length ?? 0;
   const accountName = user?.name ?? "My Account";
   const accountEmail = user?.email ?? "Signed in";
+  const isAccountRoute =
+    pathname.startsWith("/profile") ||
+    pathname.startsWith("/settings") ||
+    pathname.startsWith("/addresses") ||
+    pathname.startsWith("/my-account");
   const isAccountSettingsRoute = pathname.startsWith("/my-account/settings");
   const isProfileSectionActive =
     isAccountSettingsRoute && accountHash !== "#change-password";
@@ -152,7 +157,7 @@ export function SiteHeader() {
   const navLinkClass =
     "inline-flex items-center gap-1 text-[15px] font-medium text-slate-700 transition hover:text-[var(--brand)]";
   const iconButtonClass =
-    "relative inline-flex h-11 w-11 items-center justify-center rounded-full border border-transparent text-slate-500 transition duration-200 hover:-translate-y-0.5 hover:border-slate-200 hover:bg-white hover:text-[var(--brand)] hover:shadow-[0_14px_28px_rgba(15,23,42,0.08)]";
+    "relative inline-flex h-11 w-11 items-center justify-center rounded-full border border-transparent bg-transparent text-[#667085] transition duration-200 hover:-translate-y-0.5 hover:border-slate-200 hover:bg-white hover:text-[var(--brand)] hover:shadow-[0_14px_26px_rgba(148,163,184,0.28)]";
   const pillButtonClass =
     "inline-flex h-11 items-center justify-center rounded-full bg-[var(--brand)] px-5 text-sm font-semibold text-white shadow-[0_14px_32px_rgba(10,173,10,0.22)] transition hover:bg-[var(--brand-strong)]";
 
@@ -304,7 +309,8 @@ export function SiteHeader() {
                 aria-label="Wishlist"
                 className={cn(
                   iconButtonClass,
-                  pathname.startsWith("/wishlist") && "text-[var(--brand)]",
+                  pathname.startsWith("/wishlist") &&
+                    "border-slate-200 bg-white text-[var(--brand)] shadow-[0_12px_24px_rgba(148,163,184,0.2)]",
                 )}
                 href="/wishlist"
               >
@@ -320,7 +326,8 @@ export function SiteHeader() {
                 aria-label="Cart"
                 className={cn(
                   iconButtonClass,
-                  pathname.startsWith("/cart") && "text-[var(--brand)]",
+                  pathname.startsWith("/cart") &&
+                    "border-slate-200 bg-white text-[var(--brand)] shadow-[0_12px_24px_rgba(148,163,184,0.2)]",
                 )}
                 href="/cart"
               >
@@ -339,12 +346,15 @@ export function SiteHeader() {
                     aria-label={
                       user?.name ? `Open ${user.name} account menu` : "Open account menu"
                     }
-                    className="inline-flex h-[3.2rem] w-[3.2rem] items-center justify-center rounded-full border border-slate-200 bg-white text-[var(--brand)] shadow-[0_10px_28px_rgba(15,23,42,0.06)] transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2 group-hover:-translate-y-0.5 group-hover:border-[var(--brand)]/20 group-hover:shadow-[0_18px_36px_rgba(10,173,10,0.18)] group-focus-within:-translate-y-0.5 group-focus-within:border-[var(--brand)]/20 group-focus-within:shadow-[0_18px_36px_rgba(10,173,10,0.18)]"
+                    className={cn(
+                      iconButtonClass,
+                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2 group-hover:border-slate-200 group-hover:bg-white group-hover:text-[var(--brand)] group-hover:shadow-[0_14px_26px_rgba(148,163,184,0.28)] group-focus-within:border-slate-200 group-focus-within:bg-white group-focus-within:text-[var(--brand)] group-focus-within:shadow-[0_14px_26px_rgba(148,163,184,0.28)]",
+                      isAccountRoute &&
+                        "border-slate-200 bg-white text-[var(--brand)] shadow-[0_12px_24px_rgba(148,163,184,0.2)]",
+                    )}
                     type="button"
                   >
-                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--brand-soft)]/90 transition duration-200 group-hover:bg-[var(--brand-soft)] group-focus-within:bg-[var(--brand-soft)]">
-                      <UserRound className="h-5 w-5" />
-                    </span>
+                    <UserRound className="h-5 w-5" />
                   </button>
 
                   <div
