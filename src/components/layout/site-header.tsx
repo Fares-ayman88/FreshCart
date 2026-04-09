@@ -21,7 +21,7 @@ import {
   UserRound,
   X,
 } from "lucide-react";
-import { startTransition, useEffect, useState } from "react";
+import { startTransition, useEffect, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -36,7 +36,9 @@ export function SiteHeader() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [accountMenuPathname, setAccountMenuPathname] = useState<string | null>(null);
   const [accountHash, setAccountHash] = useState("");
+  const accountMenuRef = useRef<HTMLDivElement | null>(null);
   const token = useAuthStore((state) => state.token);
   const user = useAuthStore((state) => state.user);
   const hydrated = useAuthStore((state) => state.hydrated);
@@ -60,6 +62,7 @@ export function SiteHeader() {
   const wishlistCount = wishlistQuery.data?.data?.length ?? 0;
   const accountName = user?.name ?? "My Account";
   const accountEmail = user?.email ?? "Signed in";
+  const accountMenuOpen = isAuthenticated && accountMenuPathname === pathname;
   const isAccountRoute =
     pathname.startsWith("/profile") ||
     pathname.startsWith("/settings") ||
@@ -124,11 +127,38 @@ export function SiteHeader() {
     };
   }, [pathname]);
 
+  useEffect(() => {
+    if (!accountMenuOpen) {
+      return;
+    }
+
+    const handlePointerDown = (event: MouseEvent) => {
+      if (!accountMenuRef.current?.contains(event.target as Node)) {
+        setAccountMenuPathname(null);
+      }
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setAccountMenuPathname(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [accountMenuOpen]);
+
   function handleSearchSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const nextKeyword = `${formData.get("keyword") ?? ""}`.trim();
 
+    setAccountMenuPathname(null);
     setMobileMenuOpen(false);
 
     startTransition(() => {
@@ -145,6 +175,7 @@ export function SiteHeader() {
 
   function handleLogout() {
     clearSession();
+    setAccountMenuPathname(null);
     setMobileMenuOpen(false);
     toast.success("You have been signed out.");
     router.push("/login");
@@ -167,7 +198,7 @@ export function SiteHeader() {
     <>
       <header className="fixed inset-x-0 top-0 z-50 w-full border-b border-slate-200 bg-white/95 shadow-[0_16px_40px_rgba(15,23,42,0.06)] backdrop-blur-xl">
         <div className="border-b border-slate-200 bg-slate-50/90">
-          <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 text-[13px] text-slate-600 sm:px-6 lg:px-8">
+          <div className="mx-auto flex max-w-[96rem] items-center justify-between gap-4 px-4 py-3 text-[13px] text-slate-600 sm:px-6 lg:px-8">
             <div className="flex min-w-0 items-center gap-4 sm:gap-6">
               <span className="inline-flex min-w-0 items-center gap-2 whitespace-nowrap">
                 <Truck className="h-4 w-4 text-[var(--brand)]" />
@@ -234,8 +265,8 @@ export function SiteHeader() {
             </div>
           </div>
         </div>
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between gap-4 py-4 lg:gap-7">
+        <div className="mx-auto max-w-[96rem] px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between gap-4 py-4 lg:gap-5 xl:gap-6">
             <div className="flex items-center gap-3">
               <Link className="shrink-0" href="/">
                 <Image
@@ -251,27 +282,27 @@ export function SiteHeader() {
 
             <form
               key={`${pathname}-${keyword}-desktop`}
-              className="hidden flex-1 lg:flex lg:max-w-2xl"
+              className="hidden lg:flex lg:w-[34rem] lg:flex-none xl:w-[38rem] 2xl:w-[42rem]"
               onSubmit={handleSearchSubmit}
             >
               <div className="relative w-full">
                 <input
                   defaultValue={keyword}
-                  className="h-[3.35rem] w-full rounded-full border border-slate-200 bg-slate-50/80 px-5 pr-14 text-sm text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-[var(--brand)] focus:bg-white focus:ring-4 focus:ring-green-500/10"
+                  className="h-[2.875rem] w-full rounded-full border border-slate-200 bg-white px-5 pr-12 text-[13px] font-medium leading-none tracking-[-0.01em] text-slate-900 outline-none transition-all placeholder:text-[13px] placeholder:text-slate-400 focus:border-[var(--brand)] focus:ring-4 focus:ring-green-500/10 xl:text-[14px] xl:placeholder:text-[14px]"
                   name="keyword"
                   placeholder="Search for products, brands and more..."
                 />
                 <button
-                  className="absolute right-1.5 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-[var(--brand)] text-white shadow-[0_10px_20px_rgba(10,173,10,0.28)] transition hover:bg-[var(--brand-strong)]"
+                  className="absolute right-1 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-[var(--brand)] text-white shadow-[0_10px_20px_rgba(10,173,10,0.28)] transition hover:bg-[var(--brand-strong)]"
                   type="submit"
                 >
-                  <Search className="h-4 w-4" />
+                  <Search className="h-[1.05rem] w-[1.05rem]" />
                 </button>
               </div>
             </form>
 
-            <div className="hidden items-center gap-5 lg:flex xl:gap-7">
-              <nav className="flex items-center gap-5 xl:gap-7">
+            <div className="hidden items-center gap-4 lg:flex xl:gap-5">
+              <nav className="flex items-center gap-4 xl:gap-5">
                 {NAV_LINKS.map((link) => {
                   const isActive = isLinkActive(link.href);
                   const isCategoryLink = link.label === "Categories";
@@ -293,7 +324,7 @@ export function SiteHeader() {
               </nav>
 
               <Link
-                className="hidden items-center gap-3 border-l border-slate-200 pl-5 xl:flex"
+                className="hidden items-center gap-3 border-l border-slate-200 pl-4 2xl:flex"
                 href="/contact"
               >
                 <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--brand-soft)] text-[var(--brand)]">
@@ -340,23 +371,36 @@ export function SiteHeader() {
               </Link>
 
               {isAuthenticated ? (
-                <div className="group relative hidden lg:block">
+                <div ref={accountMenuRef} className="relative hidden lg:block">
                   <button
+                    aria-controls="desktop-account-menu"
+                    aria-expanded={accountMenuOpen}
                     aria-haspopup="menu"
                     aria-label={
                       user?.name ? `Open ${user.name} account menu` : "Open account menu"
                     }
                     className={cn(
                       iconButtonClass,
-                      isAccountRoute && activeIconButtonClass,
+                      (isAccountRoute || accountMenuOpen) && activeIconButtonClass,
                     )}
                     type="button"
+                    onClick={() =>
+                      setAccountMenuPathname((current) =>
+                        current === pathname ? null : pathname,
+                      )
+                    }
                   >
                     <UserRound className="h-5 w-5" />
                   </button>
 
                   <div
-                    className="pointer-events-none invisible absolute right-0 top-full z-[70] w-[21rem] translate-y-2 pt-4 opacity-0 transition duration-200 group-hover:pointer-events-auto group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100"
+                    className={cn(
+                      "absolute right-0 top-full z-[70] w-[21rem] pt-4 transition duration-200",
+                      accountMenuOpen
+                        ? "pointer-events-auto visible translate-y-0 opacity-100"
+                        : "pointer-events-none invisible translate-y-2 opacity-0",
+                    )}
+                    id="desktop-account-menu"
                     role="menu"
                   >
                     <div className="absolute right-5 top-[0.65rem] h-4 w-4 rotate-45 rounded-[0.35rem] border-l border-t border-slate-200 bg-white" />
@@ -389,6 +433,7 @@ export function SiteHeader() {
                               )}
                               href={item.href}
                               role="menuitem"
+                              onClick={() => setAccountMenuPathname(null)}
                             >
                               <Icon
                                 className={cn(
